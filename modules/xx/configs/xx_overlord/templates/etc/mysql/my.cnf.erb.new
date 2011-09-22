@@ -1,0 +1,84 @@
+#BEGIN CONFIG INFO
+#DESCR: 4GB RAM, InnoDB only, ACID, few connections, heavy queries
+#TYPE: SYSTEM
+#END CONFIG INFO
+
+[client]
+#password	= [your_password]
+port		= 3306
+socket		= /var/run/mysqld/mysqld.sock
+
+[mysqld]
+port = 3306
+socket = /var/run/mysqld/mysqld.sock
+back_log = 50
+max_connections = 30
+max_connect_errors = 10
+table_open_cache = 2048
+max_allowed_packet = 16M
+binlog_cache_size = 1M
+max_heap_table_size = 64M
+sort_buffer_size = 8M
+join_buffer_size = 8M
+thread_cache_size = 8
+thread_concurrency = 4
+query_cache_size = 64M
+query_cache_limit = 2M
+ft_min_word_len = 4
+default-storage-engine = innodb
+thread_stack = 192K
+transaction_isolation = REPEATABLE-READ
+tmp_table_size = 64M
+#log-bin=mysql-bin
+#binlog_format=mixed
+log_warnings
+slow_query_log
+long_query_time = 2
+tmpdir = /tmp
+server-id = 1
+
+#*** MyISAM Specific options
+
+key_buffer_size = 32M
+read_buffer_size = 2M
+read_rnd_buffer_size = 16M
+bulk_insert_buffer_size = 64M
+myisam_sort_buffer_size = 128M
+myisam_max_sort_file_size = 1G
+myisam_repair_threads = 1
+myisam_recover
+
+# *** INNODB Specific options ***
+
+innodb_additional_mem_pool_size = 20M
+innodb_buffer_pool_size = 256M
+innodb_data_file_path = ibdata1:10M:autoextend
+innodb_file_io_threads = 4
+innodb_force_recovery=1
+innodb_thread_concurrency = 2
+innodb_flush_log_at_trx_commit = 1
+innodb_log_buffer_size = 64M
+innodb_log_file_size = 256M
+innodb_log_files_in_group = 3
+innodb_max_dirty_pages_pct = 90
+innodb_flush_method=O_DIRECT
+innodb_lock_wait_timeout = 120
+
+[mysqldump]
+quick
+max_allowed_packet = 16M
+
+[mysql]
+no-auto-rehash
+
+[myisamchk]
+key_buffer_size = 512M
+sort_buffer_size = 512M
+read_buffer = 8M
+write_buffer = 8M
+
+[mysqlhotcopy]
+interactive-timeout
+
+[mysqld_safe]
+open-files-limit = 8192

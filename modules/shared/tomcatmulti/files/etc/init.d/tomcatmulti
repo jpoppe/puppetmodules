@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# /etc/init.d/tomcatmulti -- startup script for the Tomcat 6 servlet engine
+#
+# Written by Jasper Poppe <jpoppe@ebay.com>
+#
+### BEGIN INIT INFO
+# Provides:          tomcatmulti
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Should-Start:      $named
+# Should-Stop:       $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start Tomcat.
+# Description:       Start the Tomcat servlet engine.
+### END INIT INFO
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+if [ $# = 1 ]; then
+	for file in /etc/default/tomcatmulti.d/*; do
+		instance=`basename $file`
+		/etc/init.d/tomcat-$instance $1 
+	done
+elif [ $# -gt 1 ]; then
+	action=$1
+	shift
+	for instance in $@; do
+		/etc/init.d/tomcat-$instance $action
+	done
+else
+	echo "Usage: $0 {start|stop|restart|try-restart|force-reload|status} [name].."
+fi

@@ -1,0 +1,81 @@
+open <%= fqdn %>:<%= port %>
+
+####################### OS/VM ###################################
+
+####################### CPU #####################################
+
+get -d java.lang -b java.lang:type=OperatingSystem ProcessCpuTime # enabled=false # enabled=true,type=COUNTER,multi=ProcessCPUTime,label=cpuTime
+
+############### Threading #################################
+
+get -d java.lang -b type=Threading ThreadCount # enabled=false # enabled=true,multi=NodeThreading,label=threadCount
+get -d java.lang -b type=Threading PeakThreadCount # enabled=false # enabled=true,multi=NodeThreading,label=peakThreadCount
+get -d java.lang -b type=Threading DaemonThreadCount # enabled=false # enabled=true,multi=NodeThreading,label=daemonThreadCount
+get -d java.lang -b type=Threading TotalStartedThreadCount # enabled=false # enabled=true,type=COUNTER,multi=NodeThreading,label=totalStartedThreadCount
+
+############### Memory ####################################
+
+get -d java.lang -b type=OperatingSystem CommittedVirtualMemorySize # enabled=false # enabled=true,multi=OSMemory,label=committedVirtualMemorySize
+get -d java.lang -b type=OperatingSystem FreePhysicalMemorySize # enabled=false # enabled=true,multi=OSMemory,label=freePhysicalMemorySize
+get -d java.lang -b type=OperatingSystem FreeSwapSpaceSize # enabled=false # enabled=true,multi=OSMemory,label=freeSwapSpaceSize
+get -d java.lang -b type=OperatingSystem TotalPhysicalMemorySize # enabled=false # enabled=true,multi=OSMemory,label=totalPhysicalMemorySize
+get -d java.lang -b type=OperatingSystem TotalSwapSpaceSize # enabled=false # enabled=true,multi=OSMemory,label=totalSwapSpaceSize
+
+get -d java.lang -b type=Memory HeapMemoryUsage.used # enabled=false # enabled=true,multi=HeapMemoryUsage,label=used
+get -d java.lang -b type=Memory HeapMemoryUsage.committed # enabled=false # enabled=true,multi=HeapMemoryUsage,label=committed
+get -d java.lang -b type=Memory HeapMemoryUsage.max # enabled=false # enabled=true,multi=HeapMemoryUsage,label=max
+get -d java.lang -b type=Memory HeapMemoryUsage.init # enabled=false # enabled=true,multi=HeapMemoryUsage,label=init
+
+get -d java.lang -b type=Memory NonHeapMemoryUsage.used # enabled=false # enabled=true,multi=NonHeapMemoryUsage,label=used
+get -d java.lang -b type=Memory NonHeapMemoryUsage.committed # enabled=false # enabled=true,multi=NonHeapMemoryUsage,label=committed
+get -d java.lang -b type=Memory NonHeapMemoryUsage.max # enabled=false # enabled=true,multi=NonHeapMemoryUsage,label=max
+get -d java.lang -b type=Memory NonHeapMemoryUsage.init # enabled=false # enabled=true,multi=NonHeapMemoryUsage,label=init
+
+############### Garbage Collector ########################################
+
+get -d java.lang -b name=Copy,type=GarbageCollector CollectionCount # enabled=false # enabled=true,type=COUNTER,multi=GCCollectionCount,label=collectionCountCopy
+get -d java.lang -b name=Copy,type=GarbageCollector CollectionTime # enabled=false # enabled=true,type=COUNTER,multi=GCCollectionTime,label=collectionTimeCopy
+get -d java.lang -b name=MarkSweepCompact,type=GarbageCollector CollectionCount # enabled=false # enabled=true,type=COUNTER,multi=GCCollectionCount,label=collectionCountMarkSweepCompact
+get -d java.lang -b name=MarkSweepCompact,type=GarbageCollector CollectionTime # enabled=false # enabled=true,type=COUNTER,multi=GCCollectionTime,label=collectionTimeMarkSweepCompact
+
+############### Memory Pools ##############################
+
+############### Code Cache ##############################
+
+get -d java.lang -b "type=MemoryPool,name=Code Cache" Usage.used # enabled=false # enabled=true,multi=CodeCacheUsage,label=used
+get -d java.lang -b "type=MemoryPool,name=Code Cache" Usage.committed # enabled=false # enabled=true,multi=CodeCacheUsage,label=committed
+get -d java.lang -b "type=MemoryPool,name=Code Cache" Usage.max # enabled=false # enabled=true,multi=CodeCacheUsage,label=max
+get -d java.lang -b "type=MemoryPool,name=Code Cache" Usage.init # enabled=false # enabled=true,multi=CodeCacheUsage,label=init
+
+get -d java.lang -b "type=MemoryPool,name=Code Cache" PeakUsage.used # enabled=false # enabled=true,multi=CodeCachePeakUsage,label=used
+get -d java.lang -b "type=MemoryPool,name=Code Cache" PeakUsage.committed # enabled=false # enabled=true,multi=CodeCachePeakUsage,label=committed
+get -d java.lang -b "type=MemoryPool,name=Code Cache" PeakUsage.max # enabled=false # enabled=true,multi=CodeCachePeakUsage,label=max
+get -d java.lang -b "type=MemoryPool,name=Code Cache" PeakUsage.init # enabled=false # enabled=true,multi=CodeCachePeakUsage,label=init
+
+############### Load ######################################
+
+get -d java.lang -b type=OperatingSystem SystemLoadAverage # enabled=false # enabled=true,multi=OSLoad,label=systemLoadAverage
+
+############### ClassLoading ##############################
+
+get -d java.lang -b type=ClassLoading LoadedClassCount # enabled=false # enabled=true,multi=ClassLoading,label=loadedClassCount
+get -d java.lang -b type=ClassLoading TotalLoadedClassCount # enabled=false # enabled=true,multi=ClassLoading,label=totalLoadedClassCount
+get -d java.lang -b type=ClassLoading UnloadedClassCount # enabled=false # enabled=true,multi=ClassLoading,label=unloadedClassCount
+
+############### Tomcat ####################################
+
+############### Thread pool ###############################
+
+get -d Catalina -b name=http-8080,type=ThreadPool maxThreads # enabled=false # enabled=true,multi=ThreadPool,label=maxThreads
+get -d Catalina -b name=http-8080,type=ThreadPool currentThreadCount # enabled=false # enabled=true,multi=ThreadPool,label=currentThreadCount
+get -d Catalina -b name=http-8080,type=ThreadPool currentThreadsBusy # enabled=false # enabled=true,multi=ThreadPool,label=currentThreadsBusy
+
+############### GlobalRequestProcessor ####################
+
+get -d Catalina -b name=http-8080,type=GlobalRequestProcessor bytesReceived # enabled=false # enabled=true,type=COUNTER,multi=RequestBytes,label=bytesReceived
+get -d Catalina -b name=http-8080,type=GlobalRequestProcessor bytesSent # enabled=false # enabled=true,type=COUNTER,multi=RequestBytes,label=bytesSent
+get -d Catalina -b name=http-8080,type=GlobalRequestProcessor requestCount # enabled=false # enabled=true,type=COUNTER,multi=RequestCount,label=requestCount
+get -d Catalina -b name=http-8080,type=GlobalRequestProcessor errorCount # enabled=false # enabled=true,type=COUNTER,multi=RequestCount,label=errorCount
+get -d Catalina -b name=http-8080,type=GlobalRequestProcessor processingTime # enabled=false # enabled=true,type=COUNTER,multi=RequestSpeed,label=processingTime
+
+close

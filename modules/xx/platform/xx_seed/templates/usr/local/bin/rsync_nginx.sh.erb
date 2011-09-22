@@ -1,0 +1,13 @@
+#!/bin/bash
+
+BASEDIR="/var/www/nginx-default"
+
+{
+	echo "Start of rsync"
+	date
+	cd ${BASEDIR}
+	rsync -avr --delete "<%= master_fqdn %>::seedpimpnginx/" ${destination}
+	date
+	echo "End of rsync"
+	echo
+} > /var/log/rsync_nginx.log 2>&1

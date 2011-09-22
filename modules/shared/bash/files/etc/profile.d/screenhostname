@@ -1,0 +1,4 @@
+if [ "$TERM" = "screen" ]; then
+	echo -e -n "\033k$HOSTNAME\033\\"
+	export force_color_prompt=yes
+fi

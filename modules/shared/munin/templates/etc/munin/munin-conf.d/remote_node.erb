@@ -1,0 +1,6 @@
+[remote;<%= fqdn %>]
+    address <%= munin_host %>	
+<% if config -%>
+<% config.each do |val| -%>    <%= val %>
+<% end -%>
+<% end -%>

@@ -1,0 +1,315 @@
+#!/bin/bash
+
+################################################################################
+#
+# TomcatManager v20090505
+#
+# Written by Jasper Poppe <jpoppe@ebay.com>
+#
+# When you don't specify user, host, password it will be read from /etc/tomcatmanager.conf
+#
+# /etc/tomcatmanager.conf example:
+#  PORT=80
+#  LOGIN=user
+#  PASSWORD=password
+#
+# -- NOTES
+# Some (useful) examples:
+#  tomcatmanager -p 8080 -d url -f /opt/csbizappreleases/csbizapp-automation-dd-1.0.1 /csbizapp-automation-dd-1.0.1
+#
+# Some (useless) examples:
+#  tomcatmanager -j query '*%3Aj2eeType=Servlet%2c*'
+#  tomcatmanager -j query '*%3Atype%3DRequestProcessor%2C*'
+#  tomcatmanager -j query 'Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost'  
+#  tomcatmanager -j set 'Catalina%3Atype%3DValve%2Cname%3DErrorReportValve%2Chost%3Dlocalhost' 'debug' '10'
+#
+# Tomcat Manager Documentation:
+#  "http://tomcat.apache.org/tomcat-6.0-doc/manager-howto.html
+#
+#------------------------------------------------------------------------------#
+
+
+### -Functions
+
+usage() {
+		cat <<EOF
+TomcatManager: Written by Jasper Poppe (jpoppe@eBay.com)
+
+Usage:
+
+  Note: <path> is context path, for example: /docs
+
+  Login (You could specify defaults for localhost in '/etc/tomcatmanager.conf'):
+  -H <user@host[:port]> - User, host and port
+  -p port               - Port (Tomcat instance)
+  -P <password>         - Password
+
+  Information:
+  -L               - List installed applications on all tomcat instances
+  -I               - Show server info 
+  -S <path>        - Show session information
+  -R               - List Available Security Roles
+
+  Actions:
+  -a <start|stop|reload> <path> - Start/Stop/Reload application
+
+  Deployment:
+  -d <rollback> <-t tag> <path>                        - Roll application back to version <tag>
+  -d <deploy|update|context> -f <file> [-t tag] <path> - Deploy/Update with WAR, application directory or context file
+  -d <undeploy> <path>                                 - Undeploy path (THIS IS IRREVERSIBLE)
+  -d url -f <file> [-t tag] <path>                     - Deploy application which is a local directory or war file by URL
+  -d base [-t tag] <file>                              - Deploy application which resides in the app base
+
+  JMX:
+  -j query [query]          - Query JMX (Leave empty to show all available beans)
+  -j set <set> <att> <val>  - JMX Set Command
+
+EOF
+}
+
+addslash() {
+	if [ "${1:0:1}" = "/" ] ; then
+		echo "${1}"
+	else
+		echo "/${1}"
+	fi
+}
+
+
+### -Argument processing
+
+while getopts "LIRSp:j:d:a:f:t:H:U:P:h" opt; do
+	case $opt in
+		H)
+			if [[ ${OPTARG} == *:* ]]; then
+				TEMP=${OPTARG%%:*}
+				LOGIN=${OPTARG%%@*}
+				HOST=${TEMP#*@}
+				PORT=${OPTARG#*:}
+			else
+				LOGIN=${OPTARG%%@*}
+				HOST=${OPTARG#*@}
+				PORT="8080"
+			fi
+		;;
+		P)
+			PASSWORD=${OPTARG}
+		;;
+		p)
+			PORT=${OPTARG}
+		;;
+		U)
+			LOGIN=${OPTARG}
+		;;
+		L) 
+			ACTION="list"
+		;;
+		R) 
+			ACTION="roles"
+		;;
+		S) 
+			ACTION="sessions"
+		;;
+		I) 
+			ACTION="serverinfo"
+		;;
+		f) 
+			LOCATION=${OPTARG}
+		;;
+		d) 
+			ACTION=${OPTARG}
+		;;
+		t) 
+			TAG=${OPTARG}
+		;;
+		j) 
+			ACTION=${OPTARG}
+		;;
+		a) 
+			#ARGUMENTS=${OPTARG}
+			ACTION=${OPTARG}
+		;;
+		h)	
+			usage
+		;;
+	esac
+done
+
+if [[ $# == 0 ]]; then
+	usage
+	exit 0
+fi
+
+shift $((${OPTIND} - 1))
+# echo "Remaining Arguments are: ${*}"
+
+### -Port/Instance Check
+
+ACTIONLIST="deploy update context stop start reload undeploy url base rollback"
+for action in ${ACTIONLIST}; do
+	if [[ ${action} == ${ACTION} ]]; then
+		if [[ -z ${PORT} ]]; then
+			echo "ERROR: You need to specify a port for this action"
+			exit 1
+		fi
+	fi
+done
+
+### -Login & Host Check
+
+[[ -z  ${HOST} ]] && HOST=localhost
+if [[ ! -d /etc/default/tomcatmulti.d/ ]] && [[ -z  ${PORT} ]]; then
+	PORT=8080
+fi
+
+if [[ -z ${PASSWORD} ]] && [[ -z ${LOGIN} ]]; then
+	if [[ -f "/etc/tomcatmanager.conf" ]]; then
+		source /etc/tomcatmanager.conf
+	else
+		echo "ERROR: You need to specify login name and password or add those to '/etc/tomcatmanager.conf'"
+		exit 1
+	fi
+fi
+
+if ! ping -q -c1 ${HOST} &> /dev/null; then
+	echo "ERROR: host '${HOST}' is unreachable"
+	exit 1
+fi
+
+### -Main Program
+
+case "${ACTION}" in
+	list|serverinfo|roles)
+		if [[ ${#} == 0 ]]; then
+			if [[ -d "/etc/default/tomcatmulti.d/" ]] && [[ -z ${PORT} ]]; then
+				for file in /etc/init.d/tomcat-*; do
+					port=`grep PORT ${file} | awk -F = {'print $2'}`
+					echo "Tomcat Instance '$(basename ${file})', serving on port: ${port}"
+					curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${port}/manager/${ACTION}"
+					echo ""
+				done
+			else
+				echo ${PORT}
+				curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/${ACTION}"
+			fi
+		else
+			echo "ERROR: ${ACTION} takes no arguments"
+		fi
+	;;
+
+	start|stop|reload|sessions|undeploy)
+		if [[ ${#} == 1 ]]; then
+			NAME=$(addslash ${*})
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/${ACTION}?path=${NAME}"
+		else
+			echo "ERROR: You need to specify one application name"
+		fi
+	;;
+
+	deploy)
+		if [[ -z ${LOCATION} ]]; then 
+			echo "ERROR: You need to specify the location"
+		elif [[ ${#} == 1 ]]; then
+			NAME=$(addslash ${*})
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/${ACTION}?path=${NAME}&tag=${TAG}" -T "${LOCATION}"
+		else
+			echo "ERROR: You need to specify one application name"
+		fi
+	;;
+
+	update)
+		if [[ -z ${LOCATION} ]]; then 
+			echo "ERROR: You need to specify the location"
+		elif [[ ${#} == 1 ]]; then
+			NAME=$(addslash ${*})
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/deploy?path=${NAME}&update=true&tag=${TAG}" -T "${LOCATION}"
+		else
+			echo "ERROR: You need to specify one application name"
+		fi
+	;;
+
+	rollback)
+		if [[ -z ${TAG} ]]; then 
+			echo "ERROR: You need to specify the tag (version) where you want to roll back to"
+		elif [[ ${#} == 1 ]]; then
+			NAME=$(addslash ${*})
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/deploy?path=${NAME}&tag=${TAG}"
+		else
+			echo "ERROR: You need to specify one application name"
+		fi
+	;;
+
+	base)
+		if [[ ${#} == 1 ]]; then
+			LOCATION=${*}
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/deploy?war=${LOCATION}&tag=${TAG}"
+		else
+			echo "ERROR: You need to specify the location where the application resists"
+		fi
+	;;
+
+	context)
+		if [[ -z ${LOCATION} ]]; then 
+			echo "ERROR: You need to specify the location"
+		elif [[ ${#} == 1 ]]; then
+			NAME=$(addslash ${*})
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/deploy?config=file:${LOCATION}&path=${NAME}&tag=${TAG}"
+		else
+			echo "ERROR: You need to specify one application name"
+		fi
+	;;
+
+	url)
+		if [[ -z ${LOCATION} ]]; then 
+			echo "ERROR: You need to specify the location"
+		elif [[ ${#} == 1 ]]; then
+			NAME=$(addslash ${*})
+			# FIXME Not working (deploying without path parameter) Tomcat bug???
+			# curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/deploy?war=jar:file:${2}!/"
+			curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/deploy?path=${NAME}&war=file:${LOCATION}&tag=${TAG}"
+		else
+			echo "ERROR: You need to specify one application name"
+		fi
+	;;
+
+	query)
+		if [[ ${#} < 2 ]]; then
+			QUERY=${*}
+			if [[ -d "/etc/default/tomcatmulti.d/" ]] && [[ -z ${PORT} ]]; then
+				for file in /etc/default/tomcatmulti.d/*; do
+					port=$(basename ${file})
+					echo "Tomcat Instance: ${port}"
+					curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${port}/manager/jmxproxy/?qry=${QUERY}"
+					echo ""
+				done
+			else
+				echo ${PORT}
+				curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/jmxproxy/?qry=${QUERY}"
+			fi
+		else
+			echo "ERROR: You need to specify one or no JMX query"
+		fi
+	;;
+
+	set)
+		if [[ ${#} == 3 ]]; then
+			if [[ -d "/etc/default/tomcatmulti.d/" ]] && [[ -z ${PORT} ]]; then
+				for file in /etc/default/tomcatmulti.d/*; do
+					port=$(basename ${file})
+					echo "Tomcat Instance: ${port}"
+					curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${port}/manager/jmxproxy/?set=${1}&att=${2}&val=${3}"
+					echo ""
+				done
+			else
+				echo ${PORT}
+				curl -s --user ${LOGIN}:${PASSWORD} "http://${HOST}:${PORT}/manager/jmxproxy/?set=${1}&att=${2}&val=${3}"
+			fi
+		else
+			echo "ERROR: You need to specify full bean name, attribute to alter, and the new value!"
+		fi
+	;;
+
+
+esac
+
+# vim:ts=4:sw=2

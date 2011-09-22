@@ -1,0 +1,90 @@
+server {
+
+	###########################################################
+	# Defaults
+	###########################################################
+
+	listen       81 default;
+	server_name  _;
+
+	access_log  /var/log/nginx/localhost.access.log;
+
+	location / {
+		root   /var/www/nginx-default;
+		index  index.html;
+	}
+
+	# deny access to .htaccess files, if Apache's document root concurs with nginx's one
+	location ~ /\.ht {
+		deny  all;
+	}
+
+	location /puppetdoc/ {
+		root           /var/lib/puppet/;
+		index          index.html;
+		allow          all;
+	}
+
+	location /nagios3/ {
+		proxy_pass       http://localhost:80;
+	}
+ 
+	location /cgi-bin/nagios3/ {
+		proxy_pass  http://localhost:80/cgi-bin/nagios3/;
+		proxy_redirect default;
+	}
+
+ 	location /gosa/ {
+		proxy_pass       http://localhost:80;
+	}
+
+ 	location /munin/ {
+		proxy_pass       http://localhost:80;
+	}
+
+ 	location /powerdns/ {
+		proxy_pass       http://localhost:18081/;
+	}
+
+ 	location /nginx {
+		proxy_pass       http://localhost:82/nginx_status;
+	}
+
+ 	location /camel {
+		proxy_pass       http://localhost:8161/camel;
+	}
+
+ 	location /admin {
+		proxy_pass       http://localhost:8161/admin;
+	}
+
+ 	location /activemq {
+		proxy_pass       http://localhost:8161/admin;
+                #rewrite /(.*) $1 break;
+		#rewrite          ^(.*)$ /admin/$1 break;
+		#proxy_redirect   /activemq /admin;
+                #proxy_set_header        Host            $host;
+                #proxy_set_header        X-Real-IP       $remote_addr;
+                #proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+		#proxy_set_header Host $host;
+	}
+
+	location /dashboard {
+		proxy_pass       http://localhost:3000;
+		proxy_redirect   default;
+                #rewrite /dashboard/(.*) /dashboard/$1 break;
+		#proxy_set_header Host $http_host;
+		#rewrite          /dashboard/(.*) /$1 break;
+		#proxy_redirect   http://localhost:3000/dashboard /;
+		#rewrite          /dashboard/(.*) /$1 break;
+		#proxy_redirect   http://localhost:3000 http://localhost:3000;
+	}
+	
+	#location /nodes/ {
+	#	proxy_pass       http://localhost:3000;
+	#}
+
+	#location /reports/ {
+	#	proxy_pass       http://localhost:3000;
+	#}
+}

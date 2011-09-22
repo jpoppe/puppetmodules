@@ -1,0 +1,13 @@
+# provides UDP syslog reception
+$ModLoad imudp
+$UDPServerRun 514
+
+# provides TCP syslog reception
+$ModLoad imtcp
+$InputTCPServerRun 514
+
+# create files for every host
+# FIXME: Make this an exported resource blabla
+:FROMHOST, startswith,"minion001"		/var/log/servers/a.c.m.e/minion001.log
+:FROMHOST, startswith,"minion002"		/var/log/servers/a.c.m.e/minion002.log
+:FROMHOST, startswith,"csinabox"		/var/log/servers/a.c.m.e/csinabox.log

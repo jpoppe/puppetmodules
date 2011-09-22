@@ -1,0 +1,27 @@
+upstream puppet-production {
+<% 8141.upto(8140+masters.to_i-1) do |port| %>    server 127.0.0.1:<%= port %>;<% end %> 
+}
+
+server {
+    listen 0.0.0.0:8140;
+
+    proxy_redirect   off;
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Client-Verify   SUCCESS;
+    proxy_set_header X-Client-DN       $ssl_client_s_dn;
+    proxy_set_header X-SSL-Subject     $ssl_client_s_dn;
+    proxy_set_header X-SSL-Issuer      $ssl_client_i_dn;
+
+    ssl on;
+    ssl_certificate        /var/lib/puppet/ssl/certs/<%= fqdn %>.pem;
+    ssl_certificate_key    /var/lib/puppet/ssl/private_keys/<%= fqdn %>.pem;
+    ssl_ciphers            ALL:-ADH:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP;
+    ssl_client_certificate /var/lib/puppet/ssl/certs/ca.pem;
+    ssl_verify_client      <%if hasca == "true"%>optional<%else%>on<%end%>;
+
+    location / {
+        proxy_pass http://puppet-production;
+	}
+}

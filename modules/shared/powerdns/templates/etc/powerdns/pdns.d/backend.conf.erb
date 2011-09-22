@@ -1,0 +1,9 @@
+launch=g<%= backend %>
+<% if backend == 'mysql' -%>
+gmysql-host=<%= db_host %>
+gmysql-user=<%= db_user %>
+gmysql-password=<%= db_password %>
+gmysql-dbname=<%= db_name %>
+<% elsif backend == 'sqlite3' -%>
+gsqlite3-database=/var/lib/powerdns/pdns.sqlite3
+<% end -%>

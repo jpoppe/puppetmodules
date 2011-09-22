@@ -1,0 +1,23 @@
+Package: apache2.2-common
+Pin: release a=fakerepo
+Pin-Priority: 1001
+
+Package: apache2-mpm-prefork
+Pin: release a=fakerepo
+Pin-Priority: 1001
+
+Package: libapache2-mod-php5
+Pin: release a=fakerepo
+Pin-Priority: 1001
+
+Package: apache2.2-common
+Pin: release a=fakerepo
+Pin-Priority: 1001
+
+Package: apache2-mpm-prefork
+Pin: release a=fakerepo
+Pin-Priority: 1001
+
+Package: libapache2-mod-php5
+Pin: release a=fakerepo
+Pin-Priority: 1001

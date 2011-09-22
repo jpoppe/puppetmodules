@@ -1,0 +1,19 @@
+tinker panic 0
+
+driftfile /var/lib/ntp/ntp.drift
+
+statsdir /var/log/ntpstats/
+
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+
+<% servers.each do |ntpserver| %>server <%= ntpserver -%> iburst dynamic
+<% end -%>
+
+restrict -4 <% restrict_options.each do |option| %><%= option -%> <% end %>
+restrict -6 <% restrict_options.each do |option| %><%= option -%> <% end %>
+
+<% restrict_ips.each do |ip| %>restrict <%= ip %>
+<% end -%>

@@ -1,0 +1,91 @@
+server {
+
+	###########################################################
+	# Defaults
+	###########################################################
+
+	listen       81 default;
+	server_name  _;
+
+	access_log  /var/log/nginx/localhost.access.log;
+
+	location / {
+		root  /var/www/nginx-default;
+		index index.html;
+	}
+
+	# deny access to .htaccess files, if Apache's document root concurs with nginx's one
+	location ~ /\.ht {
+		deny all;
+	}
+
+	location /puppetdoc/ {
+		root  /var/lib/puppet/;
+		index index.html;
+		allow all;
+	}
+
+	location /nagios3/ {
+		proxy_pass http://localhost:80;
+	}
+ 
+	location /cgi-bin/nagios3/ {
+		proxy_pass     http://localhost:80/cgi-bin/nagios3/;
+		proxy_redirect default;
+	}
+
+ 	location /gosa/ {
+		proxy_pass http://localhost:80;
+	}
+
+ 	location /pxelinux.cfg/ {
+		alias     /var/lib/tftpboot/pxelinux.cfg/;
+		autoindex on;
+		index     index.html;
+	}
+
+ 	location /recipes/ {
+		alias     /etc/seedbank/recipes/;
+		autoindex on;
+		index     index.html;
+	}
+
+ 	location /seeds/ {
+		alias     /etc/seedbank/seeds/;
+		autoindex on;
+		index     index.html;
+	}
+
+ 	location /overlays/ {
+		alias     /etc/seedbank/overlays/;
+		autoindex on;
+		index     index.html;
+	}
+
+ 	location /manifests/ {
+		alias     /etc/seedbank/manifests/;
+		autoindex on;
+		index     index.html;
+	}
+
+ 	location // {
+		alias     /etc/seedbank//;
+		autoindex on;
+		index     index.html;
+	}
+
+	location /seedbank/ {
+		alias  /usr/local/share/doc/seedbank/html/;
+		index index.html;
+		autoindex on;
+	}
+
+ 	location /munin/ {
+		proxy_pass http://localhost:80;
+	}
+
+ 	location /nginx {
+		proxy_pass http://localhost:82/nginx_status;
+	}
+
+}

@@ -1,0 +1,20 @@
+log_facility=daemon
+pid_file=/var/run/nagios/nrpe.pid
+server_port=5666
+server_address=<%= server_address %>
+nrpe_user=nagios
+nrpe_group=nagios
+allowed_hosts=<%= allowed_hosts %>
+dont_blame_nrpe=1
+command_timeout=<%= command_timeout %>
+connection_timeout=<%= connection_timeout %>
+#allow_weak_random_seed=1
+
+# Values: 0=debugging off, 1=debugging on
+debug=0
+
+# local configuration
+include=/etc/nagios/nrpe_local.cfg
+
+# local commands
+include_dir=/etc/nagios/nrpe.d/

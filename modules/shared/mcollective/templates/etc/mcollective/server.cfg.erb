@@ -1,0 +1,40 @@
+topicprefix = /topic/
+libdir = /usr/share/mcollective/plugins
+logfile = /var/log/mcollective.log
+loglevel = info
+daemonize = 1
+
+main_collective = mcollective
+collectives = mcollective
+
+# Plugins 
+securityprovider = psk
+plugin.psk = <%= psk %>
+
+# Message Queue
+connector = stomp
+plugin.stomp.host = <%= stomp_host %>
+plugin.stomp.port = <%= stomp_port %>
+plugin.stomp.user = <%= stomp_user %>
+plugin.stomp.password = <%= stomp_password %>
+
+# Facts
+factsource = yaml
+plugin.yaml = /etc/mcollective/facts.yaml
+
+# Classes
+classesfile = /var/lib/puppet/state/classes.txt
+
+# Data Collector settings
+registerinterval = 300
+registration = Meta
+
+# Specific Plugin Settings
+plugin.service.hasstatus = true
+plugin.nrpe.conf_dir = /etc/nagios
+plugin.service.hasrestart = true
+<% if !mongo_server.empty? -%>
+plugin.registration.mongohost = <%= mongo_server %>
+plugin.registration.mongodb = puppet
+plugin.registration.collection = nodes
+<% end -%>

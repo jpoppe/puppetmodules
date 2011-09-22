@@ -1,0 +1,200 @@
+#!/usr/bin/env ruby
+
+# Copyright (c) 2008 Sam Freiberg
+#
+# Patched in 2011 by Jasper Poppe <jpoppe@ebay.com>
+#
+# Project page: http://www.darkaslight.com/projects/zoneman
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+require('rubygems')
+require('active_record')
+
+ActiveRecord::Base.establish_connection(
+  :adapter => 'mysql',
+  :host => '127.0.0.1',
+  :username => 'root',
+  :password => 'eCg_sQl51!',
+  :database => 'pdns')
+
+class Domain < ActiveRecord::Base
+  has_many :record, :dependent => :destroy
+  validates_presence_of :name
+  validates_uniqueness_of :name
+  validates_format_of :name, :with => /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{1,6}$/
+  
+  def self.inheritance_column
+  end
+end
+
+class Record < ActiveRecord::Base
+  belongs_to :domain
+  validates_presence_of :name
+  validates_format_of :name, :with => /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{1,6}$/
+  # The following list was generated from the list at http://www.dns.net/dnsrd/rr.html
+  validates_inclusion_of :type, :in =>
+    %w( A A6 AAAA CNAME DNAME DS HINFO ISDN KEY KX LOC MB MG MINFO MR MX NAPTR NULL NS NSAP PTR PX RP RT SIG SOA SRV TKEY TSIG TXT WKS X25 ),
+    :message => "isn't a valid record type"
+  validates_format_of :content,
+    :with => /\A(?:25[0-5]|(?:2[0-4]|1\d|[1-9])?\d)(?:\.(?:25[0-5]|(?:2[0-4]|1\d|[1-9])?\d)){3}\z/,
+    :if => :should_be_ip_address,
+    :message => 'is not a valid IP address'
+  
+  def self.inheritance_column
+  end
+  
+  def should_be_ip_address
+    %w(a).include? type
+  end
+end
+
+def add_domain(name, type='NATIVE')
+  domain = Domain.new(:name => name, :type => type)
+  # check for errors
+  if domain.save
+    puts "#{domain.name} has been created."
+  else
+    domain.errors.each_full { |msg| puts msg }
+  end
+end
+
+def add_record(domain_name, name, type, content, ttl=3600, prio=0)
+  domain = Domain.find_by_name(domain_name)
+  if domain
+    record = Record.new(
+      :domain_id => domain.id,
+      :name => name,
+      :type => type.upcase,
+      :content => content,
+      :ttl => ttl,
+      :prio => prio)
+    if record.save
+      puts "#{record.name} has been created"
+    else
+      record.errors.each_full { |msg| puts msg }
+    end
+  else
+    puts "#{domain_name} doesn't exist. Please create it first."
+  end
+end
+
+def delete_domain(domains)
+  #puts 'Are you sure you want to delete that domain?'
+  #ack = gets
+  #if ack == 'y'
+  #  puts 'I guess you really want to do this thing'
+  #end
+  for domain in domains
+    d = Domain.find_by_name(domain)
+    if d
+      if d.destroy
+        puts "#{d.name} has been deleted"
+      end
+    else
+      puts "#{domain} doesn't exist"
+    end
+  end
+end
+
+def delete_record(domain_name, record_name)
+  domain = Domain.find_by_name(domain_name)
+  records = Record.find_all_by_name_and_domain_id(record_name, domain.id)
+  for r in records
+    r.destroy
+    puts "#{r.name} has been deleted"
+  end
+end
+
+def edit_record(oldname, oldtype, name, type, content, ttl=3600, prio=0)
+  record = Record.find_by_name_and_type(oldname, oldtype)
+  if record
+    record.name = name unless name.nil?
+    record.type = type unless type.nil?
+    record.content = content unless content.nil?
+    record.ttl = ttl unless ttl.nil?
+    record.prio = prio unless prio.nil?
+    if record.save
+      puts "#{record.name} was modified"
+    else
+      record.erors.each_full { |msg| puts msg }
+    end
+  end
+end
+
+def help
+  puts "Help:"
+  puts "\tshow [domainname]"
+  puts "\tdelete_record <domainname> <recordname>"
+  puts "\tdelete domainname [domainname] ..."
+  puts "\tstats"
+  puts "\tadd_domain domainname"
+  puts "\tadd_record domainname name type content [ttl] [priority]"
+  puts "\tedit_record currentname currenttype name type content ttl priority"
+  puts "\texamples:"
+  puts "\t zoneman add_domain a.c.m.e"
+  puts "\t zoneman add_record a.c.m.e xx-mininon001.a.c.m.e SOA \"localhost webmaster@a.c.m.e 1\" 86400"
+  puts "\t zoneman add_record a.c.m.e a.c.m.e A 10.1.1.1"
+  puts "\t zoneman add_record a.c.m.e a.c.m.e NS ns.a.c.m.e"
+  puts "\t zoneman add_record a.c.m.e www.a.c.m.e CNAME a.c.m.e"
+end
+
+def show_domains(domain_name = nil)
+  # put in some code to make sure they end the domain
+  # with a '.'
+  if domain_name.nil?
+    domains = Domain.find(:all, :include => [:record])
+  else
+    domains = Domain.find_all_by_name(domain_name, :include => [:record])
+  end
+  for domain in domains
+    puts domain.name
+    for record in domain.record
+      puts "\t#{record.name}\t#{record.type}\t#{record.content}"
+    end
+  end
+end
+
+def stats
+  puts "#{Domain.count} domains"
+  puts "#{Record.count} records"
+end
+
+command = ARGV.shift
+subcommand = ARGV[0]
+
+if command == 'show'
+  show_domains(subcommand)
+elsif command == 'delete_record' and !subcommand.nil? and !ARGV[1].nil?
+  delete_record(subcommand, ARGV[1])
+elsif command == 'delete'
+  delete_domain(ARGV)
+elsif command == 'stats'
+  stats
+elsif command == 'add_domain' and !subcommand.nil?
+  add_domain ARGV[0]
+elsif command == 'add_record'
+  # domain_name, name, type, content, ttl=3600, prio=0
+  add_record ARGV[0], ARGV[1], ARGV[2], ARGV[3], ARGV[4], ARGV[5]
+elsif command == 'edit_record'
+  # oldname, oldtype, name, type, content, ttl=3600, prio=0
+  edit_record ARGV[0], ARGV[1], ARGV[2], ARGV[3], ARGV[4], ARGV[5], ARGV[6]
+else
+  help
+end

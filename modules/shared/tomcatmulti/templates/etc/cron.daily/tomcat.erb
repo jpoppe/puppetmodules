@@ -1,0 +1,21 @@
+#!/bin/sh
+
+NAME=<%= name %>
+DEFAULT=/etc/default/tomcatmulti.d/$NAME
+
+# The following variables can be overwritten in $DEFAULT
+
+# Default for number of days to keep old log files in /var/log/tomcatmulti/<%= name %>/
+LOGFILE_DAYS=14
+
+# End of variables that can be overwritten in $DEFAULT
+
+# overwrite settings from default file
+if [ -f "$DEFAULT" ]; then
+	. "$DEFAULT"
+fi
+
+if [ -d /var/log/tomcatmulti/$NAME ]; then
+	find /var/log/tomcatmulti/$NAME/ -name \*.log -mtime +$LOGFILE_DAYS -print0 \
+		| xargs --no-run-if-empty -0 rm --
+fi

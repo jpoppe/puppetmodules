@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This script fetches and imports the GPG database dumps.
+#
+# -- Lex van Roon <lvanroon@ebay.com>
+
+BASE_DIR="<%= base_dir %>"
+LOCK_FILE="/var/lock/sks-merge"
+
+WGET="/usr/bin/wget"
+SKS="/usr/sbin/sks"
+SU="su - debian-sks"
+TEST="/usr/bin/test"
+
+LOGFILE="/var/log/sks/sks_import_dumps.log"
+LOCKFILE_CREATE="/usr/bin/lockfile-create"
+LOCKFILE_CHECK="/usr/bin/lockfile-check"
+LOCKFILE_REMOVE="/usr/bin/lockfile-remove"
+
+#if [ x"`id -un`" != x"debian-sks" ]; then
+#	echo "You need to run this script as debian-sks, bailing out ..."
+#	exit 1
+#fi
+
+if [ -f ${LOCK_FILE}.lock ]; then
+	echo "A database import is already running or a previous run has failed, bailing out ..."
+	echo "Remove ${LOCK_FILE}.lock if you are sure that everything is fine"
+	exit 1
+fi
+
+if [ -d ${BASE_DIR}/DB ]; then
+	IMPORT_OPTIONS="merge ${BASE_DIR}/dump/*.pgp -n 10 -cache 100"
+else
+	IMPORT_OPTIONS="fastbuild -n 10 -cache 100"
+fi
+
+${LOCKFILE_CREATE} ${LOCK_FILE}
+${SU} -c "${WGET} -vcrN -l 1 -nH ftp://key-server.org/dump/" | tee -a ${LOGFILE}
+${SU} -c "${SKS} ${IMPORT_OPTIONS}" | tee -a ${LOGFILE}
+${SU} -c "${SKS} cleandb" | tee -a ${LOGFILE}
+${TEST} -d ${BASE_DIR}/PTree || ${SU} -c "${SKS} pbuild -cache 20 -ptree_cache 70" | tee -a ${LOGFILE}
+${LOCKFILE_REMOVE} ${LOCK_FILE}
+/etc/init.d/sks restart | tee -a ${LOGFILE}

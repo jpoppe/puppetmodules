@@ -1,0 +1,40 @@
+server {
+
+	###########################################################
+	# Defaults
+	###########################################################
+
+	listen       80 default;
+	server_name  _;
+	autoindex    on;
+
+	access_log  /var/log/nginx/localhost.access.log;
+
+	location / {
+		root   /var/www/nginx-default;
+		index  index.html;
+	}
+
+	location /debian {
+		root /opt/repositories;
+		index index.html;
+	}
+
+	# deny access to .htaccess files, if Apache's document root concurs with nginx's one
+	location ~ /\.ht {
+		deny  all;
+	}
+
+	###########################################################
+	# Error pages
+	###########################################################
+
+	#error_page  404  /404.html;
+
+	# redirect server error pages to the static page /50x.html
+	error_page   500 502 503 504  /50x.html;
+	location = /50x.html {
+		root   /var/www/nginx-default;
+	}
+
+}

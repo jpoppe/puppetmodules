@@ -1,0 +1,25 @@
+topicprefix = /topic/
+main_collective = mcollective
+collectives = mcollective
+libdir = /usr/share/mcollective/plugins
+logfile = /dev/null
+loglevel = info
+
+# Plugins 
+securityprovider = psk
+plugin.psk = <%= psk %>
+
+# Message Queue
+connector = stomp
+plugin.stomp.host = <%= stomp_host %>
+plugin.stomp.port = <%= stomp_port %>
+plugin.stomp.user = <%= stomp_user %>
+plugin.stomp.password = <%= stomp_password %>
+
+# Facts
+factsource = yaml
+plugin.yaml = /etc/mcollective/facts.yaml
+
+# Registration
+registerinterval = 300
+registration = Agentlist

@@ -1,0 +1,6 @@
+[general;<%= name %>]
+    address <%= host %>
+    port <%= port %>
+<% if config -%><% config.each do |val| -%>
+    <%= val %>
+<% end -%><% end -%>

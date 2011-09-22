@@ -1,0 +1,8 @@
+<% if searchpath.empty? %>domain <%= domainname %>
+<% end -%>
+<% if !searchpath.empty? %>search <%= if searchpath.kind_of?(Array) then searchpath.join(" ") else searchpath end %>
+<% end -%>
+<% nameservers.each do |ns| %>nameserver <%= ns %>
+<% end -%>
+<% if !options.empty? %>options <%= options.join(" ") %>
+<% end -%>

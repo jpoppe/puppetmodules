@@ -1,0 +1,34 @@
+cn_name: 'dashboard'
+ca_crl_path: 'certs/dashboard.ca_crl.pem'
+ca_certificate_path: 'certs/dashboard.ca_cert.pem'
+certificate_path: 'certs/dashboard.cert.pem'
+private_key_path: 'certs/dashboard.private_key.pem'
+public_key_path: 'certs/dashboard.public_key.pem'
+ca_server: 'puppet'
+ca_port: 8140
+key_length: 1024
+enable_inventory_service: true
+inventory_server: 'puppet'
+inventory_port: 8140
+use_file_bucket_diffs: true
+file_bucket_server: 'puppet'
+file_bucket_port: 8140
+no_longer_reporting_cutoff: 3600
+daily_run_history_length: 30
+use_external_node_classification: false
+
+# Uncomment the following line to set a local time zone.  Run
+# "rake time:zones:local" for the name of your local time zone.
+#time_zone: 'Pacific Time (US & Canada)'
+# Look at http://ruby-doc.org/core/classes/Time.html#M000298 for the strftime formatting
+datetime_format: '%Y-%m-%d %H:%M %Z'
+date_format: '%A, %B %e, %Y'
+
+# Set this to the URL of an image. The image will be scaled to 155x23 pixels.
+#custom_logo_url: 'http://www.puppetlabs.com/images/puppet-short.png'
+
+# We will be deprecating using "http://dashboard_servername/reports" as the puppet master's reporturl.
+# Set this to 'true' once you have changed all your puppet masters to send reports to
+# "http://dashboard_servername/reports/upload"
+disable_legacy_report_upload_url: false
+enable_read_only_mode: false

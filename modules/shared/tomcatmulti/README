@@ -1,0 +1,1 @@
+This class manages Tomcat 6 in such a way that it is easy to run multiple instances.

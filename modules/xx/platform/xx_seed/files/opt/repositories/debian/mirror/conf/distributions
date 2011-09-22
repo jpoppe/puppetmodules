@@ -1,0 +1,31 @@
+Origin: Debian
+Codename: squeeze
+Description: Official Debian Squeeze mirror
+Architectures: amd64 source
+Components: main contrib non-free
+UDebComponents: main
+Contents: .gz
+Update: - debian-squeeze
+Log: /opt/repositories/debian/mirror/logs/mirror.log
+SignWith: 123456
+
+Origin: Debian
+Codename: squeeze-updates
+Description: Official Debian Squeeze mirror
+Architectures: amd64 source
+Components: main contrib non-free
+UDebComponents: main
+Contents: .gz
+Update: - debian-squeeze-updates
+Log: /opt/repositories/debian/mirror/logs/mirror.log
+SignWith: 123456
+
+Origin: Debian
+Codename: squeeze-security
+Description: Official Debian Squeeze mirror
+Architectures: amd64 source
+Components: main contrib non-free
+Contents: .gz
+Update: - debian-squeeze-security
+Log: /opt/repositories/debian/mirror/logs/mirror.log
+SignWith: 123456

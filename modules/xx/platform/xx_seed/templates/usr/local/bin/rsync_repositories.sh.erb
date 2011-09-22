@@ -1,0 +1,10 @@
+#!/bin/bash
+
+{
+	echo "Start of rsync"
+	date
+	rsync -avr --delete <%= master_fqdn %>::repositories /opt/repositories/
+	date
+	echo "End of rsync"
+	echo
+} > /var/log/rsync_repositories.log 2>&1

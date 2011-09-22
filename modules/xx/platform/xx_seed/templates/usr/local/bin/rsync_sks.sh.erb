@@ -1,0 +1,10 @@
+#!/bin/bash
+
+{
+	echo "Start of rsync"
+	date
+	rsync -avr --delete <%= master_fqdn %>::sks /opt/sks/
+	date
+	echo "End of rsync"
+	echo
+} > /var/log/rsyncsks.log 2>&1

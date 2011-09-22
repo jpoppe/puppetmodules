@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+# /etc/init.d/tomcat6 -- startup script for the Tomcat 6 servlet engine
+#
+# Written by Miquel van Smoorenburg <miquels@cistron.nl>.
+# Modified for Debian GNU/Linux	by Ian Murdock <imurdock@gnu.ai.mit.edu>.
+# Modified for Tomcat by Stefan Gybas <sgybas@debian.org>.
+# Modified for Tomcat6 by Thierry Carrez <thierry.carrez@ubuntu.com>.
+# Additional improvements by Jason Brittain <jason.brittain@mulesoft.com>.
+# TomcatMulti functionality added by Jasper Poppe <jpoppe@ebay.com>
+#
+### BEGIN INIT INFO
+# Provides:          tomcat6
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Should-Start:      $named
+# Should-Stop:       $named
+# Default-Start:
+# Default-Stop:
+# Short-Description: Start Tomcat.
+# Description:       Start the Tomcat servlet engine.
+### END INIT INFO
+
+echo Please use the tomcactmulti script.

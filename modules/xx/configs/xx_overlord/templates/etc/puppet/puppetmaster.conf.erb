@@ -1,0 +1,24 @@
+[main]
+modulepath = $confdir/modules/shared:$confdir/modules/users:$confdir/modules/xx/platform:$confdir/modules/private:$confdir/modules/xx/configs:$confdir/modules/mp/configs
+<% if !puppet_ca.empty? -%>
+ca_server = <%= puppet_ca %>
+<% end -%>
+<% if !amq_password.empty? -%>
+queue_type = stomp
+queue_source = stomp://puppet:123puppet@localhost:61613
+<% end -%>
+dbadapter = mysql
+dbserver = localhost
+dbuser = puppet
+dbpassword = puppet123
+
+[master]
+facts_terminus = inventory_active_record
+ssldir = /var/lib/puppet/ssl
+ca = <%= ca %>
+storeconfigs = true
+reports = http, store
+reporturl = http://localhost:3000/reports
+<% if !amq_password.empty? -%>
+async_storeconfigs = true
+<% end -%>

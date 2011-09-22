@@ -1,0 +1,13 @@
+puppetmaster,overlord001.a.c.m.e
+ntpservers,overlord001.a.c.m.e
+domainname,a.c.m.e
+searchpath,a.c.m.e
+nameservers,192.168.20.1
+snmp_syslocation,inAbox
+snmp_com2sec_readonly,acmefactory123
+snmp_syscontact,Jasper Poppe <jpoppe@ebay.com>
+aptrepos,deb http://192.168.122.1/debian/mirror %{lsbdistcodename} main non-free contrib,deb http://192.168.122.1/debian/mirror squeeze-updates main non-free contrib,deb http://192.168.122.1/debian/mirror squeeze-security main non-free contrib,deb http://192.168.122.1/debian/sn %{lsbdistcodename} main
+rootpw,*
+postfix_interfaces,all
+postfix_relay,mx.overlord.a.c.m.e
+puppetca,overlord001.a.c.m.e

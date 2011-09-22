@@ -1,0 +1,4 @@
+tftpd-hpa	tftpd-hpa/options	string	--secure
+tftpd-hpa	tftpd-hpa/address	string	0.0.0.0:69
+tftpd-hpa	tftpd-hpa/directory	string	/var/lib/tftpboot
+tftpd-hpa	tftpd-hpa/username	string	tftp

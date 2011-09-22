@@ -1,0 +1,6 @@
+START=yes
+DAEMON_OPTS="--config /etc/puppet/puppetmaster.conf"
+SERVERTYPE=webrick
+PORT=8140
+PUPPETQD=no
+PUPPETQD_OPTS=""

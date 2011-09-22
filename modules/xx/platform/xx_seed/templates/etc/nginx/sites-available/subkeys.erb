@@ -1,0 +1,20 @@
+upstream sks {
+	server 127.0.0.1:11371;
+}
+
+server {
+	listen       80;
+	server_name  subkeys.<%= domain %>;
+
+	access_log  /var/log/nginx/localhost.access.log;
+
+	location / {
+		proxy_pass http://sks;
+		index  index.html;
+	}
+
+	location ~ /\.ht {
+		deny  all;
+	}
+
+}

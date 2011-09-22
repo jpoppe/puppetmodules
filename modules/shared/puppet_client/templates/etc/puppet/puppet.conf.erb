@@ -1,0 +1,19 @@
+[main]
+logdir=/var/log/puppet
+vardir=/var/lib/puppet
+ssldir=/var/lib/puppet/ssl
+rundir=/var/run/puppet
+factpath=$vardir/lib/facter
+templatedir=$confdir/templates
+runinterval=<%= runinterval %>
+configtimeout=<%= configtimeout %>
+splay=<%= splay.to_s %>
+splaylimit=<%= splaylimit %>
+pluginsync=<%= pluginsync.to_s %>
+usecacheonfailure=<%= usecacheonfailure.to_s %>
+server=<%= puppetmaster %>
+ca_server=<%= puppetca %>
+report_server=<%= report_server %>
+report=<%= report.to_s %>
+thin_storeconfigs=<%= thin_storeconfigs.to_s %>
+environment=<%= puppet_environment %>

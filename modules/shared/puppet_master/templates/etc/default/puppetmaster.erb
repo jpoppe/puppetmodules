@@ -1,0 +1,8 @@
+START=yes
+DAEMON_OPTS="--ssl_client_header=HTTP_X_SSL_SUBJECT --config /etc/puppet/puppetmaster.conf"
+SERVERTYPE=mongrel
+PUPPETMASTERS=<%= masters %>
+PORT=8141
+
+PUPPETQD=no
+PUPPETQD_OPTS=""

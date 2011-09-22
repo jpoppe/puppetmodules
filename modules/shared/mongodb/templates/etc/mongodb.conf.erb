@@ -1,0 +1,136 @@
+# mongodb.conf
+
+# Where to store the data.
+
+# Note: if you run mongodb as a non-root user (recommended) you may
+# need to create and set permissions for this directory manually,
+# e.g., if the parent directory isn't mutable by the mongodb user.
+dbpath=/var/lib/mongodb
+
+#where to log
+logpath=/var/log/mongodb/mongodb.log
+
+logappend=true
+
+bind_ip = <%= bind_ip %>
+port = <%= bind_port %>
+
+
+
+# Enables periodic logging of CPU utilization and I/O wait
+#cpu = true
+
+# Turn on/off security.  Off is currently the default
+<% if use_auth -%>
+auth = true
+<% else -%>
+noauth = true
+<% end -%>
+
+# Verbose logging output.
+#verbose = true
+
+# Inspect all client data for validity on receipt (useful for
+# developing drivers)
+#objcheck = true
+
+# Enable db quota management
+#quota = true
+
+# Set oplogging level where n is
+#   0=off (default)
+#   1=W
+#   2=R
+#   3=both
+#   7=W+some reads
+#oplog = 0
+
+# Diagnostic/debugging option
+#nocursors = true
+
+# Ignore query hints
+#nohints = true
+
+# Disable the HTTP interface (Defaults to localhost:27018).
+<% if http_interface -%>
+nohttpinterface = false
+<% else -%>
+nohttpinterface = true
+<% end -%>
+
+# Turns off server-side scripting.  This will result in greatly limited
+# functionality
+#noscripting = true
+
+# Turns off table scans.  Any query that would do a table scan fails.
+#notablescan = true
+
+# Disable data file preallocation.
+#noprealloc = true
+
+# Specify .ns file size for new databases.
+# nssize = <size>
+
+# Accout token for Mongo monitoring server.
+<% if mms_token -%>
+mms-token = <%= mms_token %>
+<% else -%>
+# mms-token = <notused>
+<% end -%>
+
+# Server name for Mongo monitoring server.
+<% if mms_name -%>
+mms-name = <%= mms_name %>
+<% else -%>
+# mms-name = <notused>
+<% end -%>
+
+# Ping interval for Mongo monitoring server.
+<% if mms_interval -%>
+mms-interval = <%= mms_interval %>
+<% else -%>
+# mms-interval = <notused>
+<% end -%>
+
+# Replication Options
+
+# in replicated mongo databases, specify here whether this is a slave or master
+<% if master -%>
+master = true
+<% else -%>
+#master = true
+<% end -%>
+<% if slave -%>
+slave = true
+<% else -%>
+#slave = true
+<% end -%>
+<% if source -%>
+source = <%= source %>
+<% else -%>
+# source = <notused>
+<% end -%>
+#only = master.example.com
+
+# Address of a server to pair with.
+<% if pair_with -%>
+pairwith = <%= pair_with -%>
+<% else -%>
+# pairwith = <notused>
+<% end -%>
+# Address of arbiter server.
+<% if arbiter -%>
+arbiter = <%= arbiter %>
+<% else -%>
+# arbiter = <notused>
+<% end -%>
+# Automatically resync if slave data is stale
+<% if autoresync -%>
+autoresync
+<% else -%>
+# autoresync
+<% end -%>
+# Custom size for replication operation log.
+#oplogSize = <MB>
+# Size limit for in-memory storage of op ids.
+#opIdMem = <bytes>

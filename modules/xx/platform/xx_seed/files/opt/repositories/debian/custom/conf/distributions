@@ -1,0 +1,8 @@
+Origin: custom
+Label: Custom Squeeze repository
+Codename: squeeze
+Architectures: amd64 source
+Components: main
+Description: Custom Squeeze repository
+SignWith: 123456
+Log: /opt/repositories/debian/custom/logs/custom.log

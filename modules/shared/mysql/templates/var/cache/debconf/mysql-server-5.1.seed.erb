@@ -1,0 +1,9 @@
+<%= package %>        mysql-server/root_password_again        password	<%= root_password %>
+<%= package %>        mysql-server/root_password      password	<%= root_password %>
+<%= package %>        mysql-server/error_setting_password     error
+<%= package %>        <%= package %>/nis_warning    note
+<%= package %>        <%= package %>/really_downgrade       boolean false
+<%= package %>        <%= package %>/start_on_boot  boolean true
+<%= package %>        <%= package %>/postrm_remove_databases        boolean false
+<%= package %>        mysql-server/password_mismatch  error
+<%= package %>        mysql-server/no_upgrade_when_using_ndb  error

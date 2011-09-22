@@ -1,0 +1,15 @@
+puppetmaster,overlord001.poppe.local
+ntpservers,ntp.overlord001.poppe.local
+domainname,poppe.local
+searchpath,poppe.local
+nameservers,192.168.0.1,192.168.0.2
+snmp_syslocation,Amsterdam
+snmp_com2sec_readonly,secret123
+snmp_syscontact,Jasper Poppe <jpoppe@ebay.com>
+pam_filter,|(host=prod)(host=mp)
+aptrepos,deb http://overlord.poppe.local/debian/mirror %{lsbdistcodename} main non-free contrib,deb http://overlord.poppe.local/debian/mirror %{lsbdistcodename}-security main non-free contrib,deb http://overlord.poppe.local/debian/mirror %{lsbdistcodename}-updates main non-free contrib,deb http://overlord.poppe.local/debian/sn %{lsbdistcodename} main
+rootpw,*
+packages,links,dstat,sl,cowsay,bzip2,telnet,exuberant-ctags,vim,vim-nox,mc,apt-file,at
+puppetca,puppetca001.popppe.local
+postfix_interfaces,loopback-only
+postfix_relay,mx.overlord001.poppe.local
